@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>stopwatch</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+        }
+
+        .container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 100px;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        #display {
+            font-size: 50px;
+        }
+
+        .buttons {
+            display: flex;
+            flex-direction: row;
+            gap: 200px;
+        }
+
+        .lap,
+        .start {
+            display: flex;
+            height: 103px;
+            width: 103px;
+            background-color: black;
+            border-radius: 52px;
+            border: 3px solid rgb(63, 59, 59);
+            align-items: center;
+            justify-content: center;
+
+        }
+
+        #lap-button,
+        #start-button {
+            border-radius: 53px;
+            background-color: rgb(63, 59, 59);
+            border: white;
+            color: white;
+            height: 100px;
+            width: 100px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+            font-size: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="time" id="display">00:00:00</div>
+        <div class="buttons">
+            <div class="lap">
+                <button id="lap-button">Reset</button>
+            </div>
+            <div class="start">
+                <button id="start-button">Start</button>
+            </div>
+        </div>
+        <ul id="lap-list"></ul>
+    </div>
+</body>
+<script>
+    const startBtn = document.getElementById('start-button');
+    const lapBtn = document.getElementById('lap-button');
+    const startDiv = document.querySelector('.start');
+    const lapList = document.getElementById('lap-list');
+
+    let timerInterval;
+    let elapsedTime = 0;
+    let isRunning = false;
+    let lapCount = 0;
+
+    startBtn.addEventListener('click', function () {
+        if (!isRunning) {
+            startTimer();
+            startBtn.textContent = 'Stop';
+            lapBtn.textContent = 'Lap';
+            startBtn.style.backgroundColor = 'rgb(106, 38, 38)';
+            startDiv.style.border = '3px solid rgb(106, 38, 38)';
+        } else {
+            stopTimer();
+            startBtn.textContent = 'Start';
+            lapBtn.textContent = 'Reset';
+            startBtn.style.backgroundColor = 'rgb(63,59,59)';
+            startDiv.style.border = '3px solid rgb(63,59,59)';
+        }
+    });
+
+    lapBtn.addEventListener('click', function () {
+        if (isRunning) {
+            recordLap();
+        }
+        else {
+            resetTimer();
+        }
+    });
+
+    function startTimer() {
+        if (timerInterval) return;
+        isRunning = true;
+        timerInterval = setInterval(() => {
+            elapsedTime++;
+            document.getElementById('display').innerText = formatTime(elapsedTime);
+        }, 1000);
+    }
+
+    function stopTimer() {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        isRunning = false;
+    }
+
+    function resetTimer(){
+        stopTimer();
+        elapsedTime=0;
+        lapCount=0;
+        document.getElementById('display').innerText=formatTime(elapsedTime);
+        lapList.innerHTML='';
+    }
+
+    function recordLap(){
+        lapCount++;
+        const lapTime=formatTime(elapsedTime);
+        const li=document.createElement('li');
+        li.textContent=`Lap ${lapCount}: ${lapTime}`;
+        lapList.appendChild(li);
+    }
+
+    function formatTime(timeInSeconds){
+        const hours=Math.floor(timeInSeconds/3600);
+        const minutes=Math.floor((timeInSeconds%3600)/60);
+        const seconds=timeInSeconds%60;
+
+        return `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+    }
+
+</script>
+
+</html>
