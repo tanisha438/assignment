@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>movies</title>
+    <style>
+        *{
+            scroll-behavior: smooth;
+        }
+        #nav{
+            display:flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        #container{
+            height:100vh;
+            width:100vw;
+        }
+        #flex{
+            display:flex;
+            flex-wrap: wrap;
+            justify-content:center;
+            gap:30px;
+            padding:10px;
+            height:100vh;
+        }
+        .movie{
+            border:1px solid #ccc;
+            padding:10px;
+            text-align: center;
+            width:250px;
+            height:400px;
+            border-radius:10px;
+        }
+        .movie img{
+            max-width: 100%;
+            height:auto;
+        }
+        .movie h3{
+            margin:10px 0;
+        }
+        .movie p{
+            margin:5px 0;
+        }
+        .movie a{
+            text-decoration: none;
+            color:rebeccapurple;
+        }
+        .stars{
+            color:gold;
+        }
+        .none{
+            text-align: center;
+            font-size: 18px;
+            color:rgb(91, 49, 56);
+            margin-top: 20px;;
+        }
+    </style>
+</head>
+<body>
+    <nav id="nav">
+        <label for="option">Search by ratings:</label>
+        <select id="option">
+            <option value="0">All</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </select>
+    </nav>
+    <div id="container">
+        <div id="flex">
+
+        </div>
+    </div>
+</body>
+<script>
+    let movies=[];
+    document.addEventListener("DOMContentLoaded",function(){
+        const xhr=new XMLHttpRequest();
+        xhr.open("get","https://feecq.github.io/api/movies.json",true);
+        xhr.responseType="json";
+        xhr.onload= function(){
+            if(xhr.status===200){
+                movies=xhr.response;
+                populateFlex(movies);
+            }
+        };
+        xhr.send();
+
+        document.getElementById('option').addEventListener('change', function() {
+    const selectedRating = parseInt(this.value);
+    let filteredMovies;
+    
+    if (selectedRating) {
+        filteredMovies = movies.filter(movie => Math.round(movie.rating / 2) === selectedRating);
+    } else {
+        filteredMovies = movies;
+    }
+    
+    populateFlex(filteredMovies);
+});
+
+    });
+
+        function populateFlex(movies){
+            const flex=document.getElementById('flex');
+            flex.innerHTML='';
+
+            if(movies.length===0){
+                const noMovies=document.createElement('div');
+                noMovies.classList.add('none');
+                noMovies.textContent="None of this rating"
+                flex.appendChild(noMovies);
+                return;
+            }
+
+            movies.forEach(movie=> {
+                const movieDiv=document.createElement('div');
+                movieDiv.classList.add('movie');
+
+                const title=document.createElement('h3');
+                title.textContent=movie.movie;
+
+                const rating=movie.rating/2;
+                const stars=document.createElement('div');
+                stars.classList.add('stars');
+                stars.innerHTML=goldenStars(rating);
+
+                const img=document.createElement('img');
+                img.src=movie.image;
+                img.alt=`${movie.movie}`;
+
+                const imdbLink=document.createElement('a');
+                imdbLink.href=movie.imdb_url;
+                imdbLink.target="_blank";
+                imdbLink.textContent="View on IMDb";
+
+                movieDiv.appendChild(img);
+                movieDiv.appendChild(title);
+                movieDiv.appendChild(stars);
+                movieDiv.appendChild(imdbLink);
+
+                flex.appendChild(movieDiv);
+            });
+        }
+
+        function goldenStars(rating){
+            const fullStar='★';
+            const halfStar='⯨';
+            const emptyStar='☆';
+            let stars='';
+            for(let i=0;i<5;i++)
+        {
+            if(i<Math.floor(rating))
+        {
+            stars+=fullStar;
+        }
+        else if(i<rating)
+        {
+            stars+=halfStar;
+        }
+        else{
+            stars+=emptyStar;
+        }
+        }
+        return stars;
+        }
+
+</script>
+</html>
