@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>todolist</title>
+    <style>
+        .container{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:10px;
+            height:100vh;
+        }
+        #to-do-list{
+            display:grid;
+            height:100%;
+            background-color: pink;
+        }
+        #right{
+            background-color: lightblue;
+            height: 100%;
+            padding:10px;
+        }
+        #text{
+            height:10%;
+            border-color: none;
+            background-color:lightblue;
+            width:100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+    <div id="right">
+        <input type="text" id="text">
+    </div>
+    <div id="to-do-list">
+        <ul id="list">
+
+        </ul>
+    </div>
+</div>
+</body>
+<script>
+    const div = document.querySelector('#to-do-list');
+    const ul = document.querySelector('#list');
+    const input = document.querySelector('#text');
+
+    input.addEventListener('keyup', function (e) {
+        if (e.key === "Enter") {
+            addTask(input.value);
+            saveTask(input.value);
+            input.value = '';
+        }
+    });
+
+    function removetask(removeitem){
+        let tasks=JSON.parse(localStorage.getItem('tasks')) || [];
+        tasks=tasks.filter(task=>task!==removeitem);
+        localStorage.setItem('tasks',JSON.stringify(tasks));
+    }
+
+    function addTask(tasklist) {
+        const li = document.createElement('li');
+        li.textContent = tasklist;
+
+        const checkbox = document.createElement('input');
+        checkbox.type = "checkbox";
+        checkbox.addEventListener('change', function () {
+            if (checkbox.checked) {
+                li.style.textDecoration = "line-through";
+            }
+            else {
+                li.style.textDecoration = "none";
+            }
+        });
+
+        const button=document.createElement('button');
+        button.textContent="x";
+        button.addEventListener('click',function(){
+            ul.removeChild(li);
+            removetask(tasklist);
+        });
+
+        li.appendChild(checkbox);
+        li.appendChild(button);
+        ul.appendChild(li);
+    }
+
+    function saveTask(task){
+        const tasks=JSON.parse(localStorage.getItem('tasks')) || [];
+        tasks.push(task);
+        localStorage.setItem('tasks',JSON.stringify(tasks));
+    }
+
+    window.onload=function(){
+        const stored=JSON.parse(localStorage.getItem('tasks')) || [];
+        stored.forEach(task=>addTask(task));
+    }
+</script>
+</html>
